@@ -3,9 +3,12 @@ package g20.brunelplanner.views.activities.fragments;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,6 +34,13 @@ public class MapFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         mapLocation = this.getArguments().getString("mapLocation");
         type = this.getArguments().getString("type");
+        final TextView hintmessage = (TextView) view.findViewById(R.id.hint);
+        hintmessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hintmessage.setText("");
+            }
+        });
         return view;
     }
 
@@ -56,7 +66,11 @@ public class MapFragment extends Fragment {
                     } else {
                         object = MapService.queryBuildingsDB(mapLocation);
                     }
-
+                    try {
+                        ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(mapLocation);
+                    } catch (NullPointerException e) {
+                        Log.e("MapFragment", "onCreateView: ", e);
+                    }
                     double mapLat = object[0];
                     double mapLong = object[1];
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng( mapLat, mapLong), 18.0f));
